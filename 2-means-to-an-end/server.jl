@@ -34,7 +34,7 @@ function session(sock::Sockets.TCPSocket)
 
     function insert(time::Int32,price::Int32)
         if isempty(db)
-            insert!(db,1,(time,price))
+            insert!(db,1,(time,Int64(price)))
             return
         end
 
