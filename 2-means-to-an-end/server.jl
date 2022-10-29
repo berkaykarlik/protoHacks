@@ -33,17 +33,18 @@ function session(sock::Sockets.TCPSocket)
     db = Vector{Tuple{Int32,Int32}}()
 
     function insert(time::Int32,price::Int32)
-        #TODO: binary search would be faster
         if isempty(db)
             insert!(db,1,(time,price))
             return
         end
 
-
         for n in eachindex(db)
-            if db[n][1] >= time
-                insert!(db,n,(time,price))
-                return
+            if db[n][1] == time
+                return false
+            end
+            if db[n][1] > time
+                insert!(db,n,(time,Int64(price)))
+                return true
             end
         end
         push!(db,(time,price))
@@ -53,8 +54,8 @@ function session(sock::Sockets.TCPSocket)
         if min > max
             return 0
         end
-        excluded_lower=filter(x-> x[1] >= min, db )
-        valid_range=filter(x-> x[1] <= max, excluded_lower )
+        excluded_lower=filter(x-> x[1] >= min, db)
+        valid_range=filter(x-> x[1] <= max, excluded_lower)
 
         if isempty(valid_range)
             return 0
@@ -69,22 +70,23 @@ function session(sock::Sockets.TCPSocket)
         msg_type = check_msg_type(c)
 
         if isnothing(msg_type)
-            close(sock)
-            return
+            break
         end
 
         st = bytes_to_int32(c[2:5])
         nd = bytes_to_int32(c[6:9])
 
         if msg_type == "insertion"
-            insert(st,nd)
+            is_inserted = insert(st,nd)
+            if is_inserted == false
+                break
+            end
         elseif msg_type == "query"
             mean_price = query(st,nd)
             response = int32_to_bytes(mean_price)
             write(sock,response)
-        else
-            break
         end
+
     end
     close(sock)
 end
