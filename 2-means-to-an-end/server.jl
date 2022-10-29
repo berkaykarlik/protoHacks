@@ -30,11 +30,11 @@ function int32_to_bytes(i::Int32)::Vector{UInt8}
 end
 
 function session(sock::Sockets.TCPSocket)
-    db = Vector{Tuple{Int32,Int32}}()
+    db = Vector{Tuple{Int,Int}}()
 
     function insert(time::Int32,price::Int32)
         if isempty(db)
-            insert!(db,1,(time,Int64(price)))
+            insert!(db,1,(time,price))
             return
         end
 
@@ -43,7 +43,7 @@ function session(sock::Sockets.TCPSocket)
                 return false
             end
             if db[n][1] > time
-                insert!(db,n,(time,Int64(price)))
+                insert!(db,n,(time,price))
                 return true
             end
         end
@@ -55,12 +55,13 @@ function session(sock::Sockets.TCPSocket)
             return 0
         end
         excluded_lower=filter(x-> x[1] >= min, db)
-        valid_range=filter(x-> x[1] <= max, excluded_lower)
+        valid_range= filter!(x-> x[1] <= max, excluded_lower)
 
         if isempty(valid_range)
             return 0
         end
 
+        map!(x->(x[1],Int64(x[2])),valid_range,valid_range)
         total_sum=mapreduce(x -> x[2] ,+,valid_range)
         return Int32(floor(total_sum / length(valid_range)))
     end
