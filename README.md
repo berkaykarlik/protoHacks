@@ -7,3 +7,4 @@ my solutions to [protohackers](https://protohackers.com/) challenges.
 2. [Means to an End](https://protohackers.com/problem/2) | [julia](/2-means-to-an-end/server.jl)
 3. [Budget Chat](https://protohackers.com/problem/3) | [julia](/3-budget-chat/server.jl)
 4. [Unusual Database Program](https://protohackers.com/problem/4) | [julia](/4-unusual-database-program/server.jl)
+5. [Mob in the Middle](https://protohackers.com/problem/5) | [julia](/5-mob-in-the-middle/server.jl)
