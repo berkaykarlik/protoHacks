@@ -25,7 +25,7 @@ end
 
 
 socket = Sockets.UDPSocket()
-bind(socket, ip"127.0.0.1", 5000)
+bind(socket, ip"0.0.0.0", 5000)
 
 while true
     hostport, packet = Sockets.recvfrom(socket)
